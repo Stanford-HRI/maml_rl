@@ -406,6 +406,12 @@ class WaterWorld(AbstractMAEnv, EzPickle):
         cv2.waitKey(rate)
         return np.asarray(img)[..., ::-1]
 
+    def log_diagnostics(self, paths, prefix=''):
+        """
+        Log extra information per iteration based on the collected paths
+        """
+        pass
+
 
 if __name__ == '__main__':
     env = WaterWorld()
