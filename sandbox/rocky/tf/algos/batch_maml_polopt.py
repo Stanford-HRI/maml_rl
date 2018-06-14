@@ -171,6 +171,7 @@ class BatchMAMLPolopt(RLAlgorithm):
                         start = time.time()
                         paths = self.obtain_samples(itr, reset_args=learner_env_goals, log_prefix=str(step))
                         all_paths.append(paths)
+                        import pdb; pdb.set_trace()
                         end = time.time()
                         logger.log("Time to obtain samples " + str(end-start))
                         start = end
