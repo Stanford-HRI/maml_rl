@@ -149,6 +149,7 @@ class BatchMAMLPolopt(RLAlgorithm):
 
             self.start_worker()
             start_time = time.time()
+            start = time.time()
             for itr in range(self.start_itr, self.n_itr):
                 itr_start_time = time.time()
                 with logger.prefix('itr #%d | ' % itr):
@@ -167,8 +168,12 @@ class BatchMAMLPolopt(RLAlgorithm):
                         #    import pdb; pdb.set_trace() # test param_vals functions.
                         logger.log('** Step ' + str(step) + ' **')
                         logger.log("Obtaining samples...")
+                        start = time.time()
                         paths = self.obtain_samples(itr, reset_args=learner_env_goals, log_prefix=str(step))
                         all_paths.append(paths)
+                        end = time.time()
+                        logger.log("Time to obtain samples " + str(end-start))
+                        start = end
                         logger.log("Processing samples...")
                         samples_data = {}
                         for key in paths.keys():  # the keys are the tasks
@@ -177,16 +182,25 @@ class BatchMAMLPolopt(RLAlgorithm):
                         all_samples_data.append(samples_data)
                         # for logging purposes only
                         self.process_samples(itr, flatten_list(paths.values()), prefix=str(step), log=True)
+                        end = time.time()
+                        logger.log("Time to process samples " + str(end-start))
+                        start = end
                         logger.log("Logging diagnostics...")
                         self.log_diagnostics(flatten_list(paths.values()), prefix=str(step))
                         if step < self.num_grad_updates:
                             logger.log("Computing policy updates...")
+                            end = time.time()
                             self.policy.compute_updated_dists(samples_data)
+                            logger.log("Time to compute policy updates " + str(end-start))
+                            start = end
 
 
                     logger.log("Optimizing policy...")
                     # This needs to take all samples_data so that it can construct graph for meta-optimization.
                     self.optimize_policy(itr, all_samples_data)
+                    end = time.time()
+                    logger.log("Time to update policy " + str(end-start))
+                    start = end
                     logger.log("Saving snapshot...")
                     params = self.get_itr_snapshot(itr, all_samples_data[-1])  # , **kwargs)
                     if self.store_paths:
