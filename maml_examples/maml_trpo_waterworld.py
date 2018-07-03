@@ -36,7 +36,7 @@ for fast_learning_rate in fast_learning_rates:
     for learning_rate in learning_rates:
         for bas in baselines:
             stub(globals())
-            env = TfEnv(normalize(WaterWorld()))
+            env = TfEnv(normalize(WaterWorld(meta=True)))
             # print(env)
             # input()
             policy = MAMLGaussianMLPPolicy(
